@@ -1,0 +1,50 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box }
+body { height: 100vh; display: grid; place-items: center; background-color: #1D1E22 }
+
+/* scene set-up */
+[scene], [rotation], [center-z] { display: grid }
+[scene] :not(:empty) { transform-style: preserve-3d }
+[scene] { width: var(--size); perspective: calc(var(--size) * 2); aspect-ratio: 1 }
+
+/* rotate/animate scene  */
+[rotation][animate="true"] { animation: rotateScene 10s linear infinite }
+@keyframes rotateScene{ to { transform: rotateY(360deg) } }
+
+/* position contents to z-center */
+[center-z] { transform: translateZ(calc(var(--size) * .5)) }
+
+/* grid */
+[grid] { 
+  display: grid;
+  grid-template-columns: repeat(var(--dimension), 1fr);
+  grid-template-rows: repeat(var(--dimension), 1fr);
+}
+
+/* pixel */
+[pixel] {
+  --pixel-size: calc(var(--size) / var(--dimension));
+  grid-row: calc(var(--dimension) - var(--l) + 1); 
+  grid-column: var(--c); 
+  transform: translateZ(calc(var(--pixel-size) * (var(--r) - 1) * -1));
+  background-color: var(--color);
+}
+/* sides set up */
+[pixel], [pixel] > span { display: grid }
+[pixel] > span { background-color: inherit; transform-style: preserve-3d }
+[pixel]::before, [pixel]::after, [pixel] > span::before, [pixel] > span::after { content: ""; background-color: inherit }
+[pixel]::before, [pixel]::after, [pixel] > span, [pixel] > span::before, [pixel] > span::after { grid-column: 1; grid-row: 1 }
+
+/*sides orientation*/
+[pixel]::before { transform-origin: left; transform: rotateY(90deg) } /*left*/
+[pixel]::after { transform-origin: right; transform: rotateY(-90deg) } /*right*/
+[pixel] > span { transform: translateZ(calc(var(--pixel-size) * -1)) } /*back*/
+[pixel] > span::before { transform-origin: top; transform: rotateX(90deg) } /*top*/
+[pixel] > span::after { transform-origin: bottom; transform: rotateX(-90deg) } /*bottom*/
+
+/* shading */
+[pixel]::after{ background-image: linear-gradient(rgb(0 0 0 / .25) 100%, transparent) }/*right*/
+[pixel] > span::after { background-image: linear-gradient(rgb(0 0 0 / .375) 100%, transparent) }/*bottom*/
+
+/*lighting*/
+[pixel]::before { background-image: linear-gradient(rgba(150, 30, 30, 0.25) 100%, transparent) }/*left*/
+[pixel] > span::before { background-image: linear-gradient(rgb(255 255 255 / .375) 100%, transparent) }/*top*/
